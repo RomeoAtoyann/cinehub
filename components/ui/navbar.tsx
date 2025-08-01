@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, MenuIcon, SearchIcon } from "lucide-react";
+import { Menu, MenuIcon } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "./input";
+import SearchDialog from "./search-dialog";
 
 const Navbar = () => {
   return (
@@ -38,8 +38,12 @@ const Navbar = () => {
             </Link>
           </ul>
 
-          {/* Mobile Sidebar */}
-          <div className="lg:hidden">
+          {/* Search and Mobile Menu */}
+          <div className="flex items-center gap-4">
+            <SearchDialog />
+            
+            {/* Mobile Sidebar */}
+            <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -71,6 +75,7 @@ const Navbar = () => {
                 </div>
               </SheetContent>
             </Sheet>
+            </div>
           </div>
         </div>
       </nav>
