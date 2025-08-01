@@ -1,9 +1,22 @@
-import React from 'react'
+import Hero from "@/components/ui/hero";
+import MovieRow from "@/components/ui/movie-row";
+import React from "react";
 
 const Page = () => {
   return (
-    <div className='font-mono'>Page</div>
-  )
-}
+    <>
+      <div className="relative z-0 mb-8">
+        <div className="container mx-auto">
+          <Hero />
+        </div>
+      </div>
+      <div className="container mx-auto">
+        <div className="space-y-4">
+          <MovieRow platformTitle="Movies" />
+        </div>
+      </div>
+    </>
+  );
+};
 
-export default Page
+export default Page;

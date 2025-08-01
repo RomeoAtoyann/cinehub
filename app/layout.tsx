@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Red_Hat_Display, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/ui/navbar";
+import ViewMovieModal from "@/components/ui/view-movie-modal";
 
 const redHatDisplay = Red_Hat_Display({
   variable: "--font-primary",
@@ -37,7 +39,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main>{children}</main>
+          <main className="relative z-0 overflow-hidden">
+            <Navbar />
+            {children}
+            <ViewMovieModal />
+          </main>
         </ThemeProvider>
       </body>
     </html>
