@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, MenuIcon } from "lucide-react";
+import { Menu, MenuIcon, SearchIcon } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Input } from "./input";
 
 const Navbar = () => {
   return (
@@ -41,7 +42,10 @@ const Navbar = () => {
           <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button className="aspect-square border border-white p-2 size-10" variant="ghost">
+                <Button
+                  className="aspect-square border border-white p-2 size-10"
+                  variant="ghost"
+                >
                   <MenuIcon className="w-full h-full" />
                 </Button>
               </SheetTrigger>
