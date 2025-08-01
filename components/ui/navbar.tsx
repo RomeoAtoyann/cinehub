@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Menu, MenuIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -9,7 +8,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { MenuIcon } from "lucide-react";
+import Link from "next/link";
 import SearchDialog from "./search-dialog";
 
 const Navbar = () => {
