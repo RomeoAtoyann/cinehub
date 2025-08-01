@@ -88,7 +88,10 @@ const Hero = () => {
           <div>
             <Button
               onClick={() => {
-                setMovie(currentMovie);
+                setMovie({
+                  ...currentMovie,
+                  media_type: 'movie',
+                });
                 setOpen(true);
               }}
               className="hover:scale-105 transition-transform duration-200 hover:bg-white/90"

@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { searchMovies } from "@/helpers/searchMovies";
+import { searchTVShows } from "@/helpers/searchTVShows";
+import { getTVShowDetails } from "@/helpers/getTVShowDetails";
 import { useViewMovieStore } from "@/store/viewMovieStore";
 
 interface SearchResult {
@@ -22,9 +24,11 @@ interface SearchResult {
   poster_path?: string | null;
   backdrop_path?: string | null;
   release_date?: string;
+  first_air_date?: string;
   vote_average?: number;
   vote_count?: number;
   genre_ids?: number[];
+  media_type: 'movie' | 'tv';
 }
 
 interface SearchDialogProps {
@@ -48,8 +52,29 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
 
     setIsSearching(true);
     try {
-      const result = await searchMovies(query, 1);
-      setSearchResults(result.movies);
+      // Search both movies and TV shows
+      const [movieResult, tvResult] = await Promise.all([
+        searchMovies(query, 1),
+        searchTVShows(query, 1)
+      ]);
+
+      // Combine and format results
+      const movieResults = movieResult.movies.map((movie: any) => ({
+        ...movie,
+        media_type: 'movie' as const
+      }));
+
+      const tvResults = tvResult.tvShows.map((show: any) => ({
+        ...show,
+        media_type: 'tv' as const
+      }));
+
+      // Combine and sort by vote average (highest first)
+      const combinedResults = [...movieResults, ...tvResults]
+        .sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0))
+        .slice(0, 20); // Limit to top 20 results
+
+      setSearchResults(combinedResults);
     } catch (error) {
       console.error("Search failed:", error);
       setSearchResults([]);
@@ -73,22 +98,31 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
 
   const setOpen = useViewMovieStore((state) => state.setOpen);
   const setMovie = useViewMovieStore((state) => state.setMovie);
+  const setTVShowDetails = useViewMovieStore((state) => state.setTVShowDetails);
 
-  const handleResultClick = (result: SearchResult) => {
+  const handleResultClick = async (result: SearchResult) => {
     // Convert search result to movie format expected by the store
     const movie = {
       id: result.id,
       title: result.title,
-      year: result.release_date ? new Date(result.release_date).getFullYear().toString() : "",
+      year: result.release_date || result.first_air_date 
+        ? new Date(result.release_date || result.first_air_date!).getFullYear().toString() 
+        : "",
       image: result.poster_path || "",
       backdrop: result.backdrop_path || "",
       poster: result.poster_path || "",
       genre: [], // We could add genre mapping if needed
+      media_type: result.media_type,
     };
 
-    // Open the view movie modal
     setMovie(movie);
     setOpen(true);
+
+    // If it's a TV show, fetch the details
+    if (result.media_type === 'tv') {
+      const tvShowDetails = await getTVShowDetails(result.id);
+      setTVShowDetails(tvShowDetails);
+    }
     
     // Close the search dialog and reset
     setIsOpen(false);
@@ -110,7 +144,7 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
       <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-scroll flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-secondary">
-            Search Movies
+            Search Movies & TV Shows
           </DialogTitle>
         </DialogHeader>
         
@@ -119,7 +153,7 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search for movies..."
+              placeholder="Search for movies and TV shows..."
               value={searchQuery}
               onChange={handleSearchChange}
               className="pl-10 pr-4"
@@ -189,10 +223,15 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
                       </div>
 
                       {/* Release Year */}
-                      {result.release_date && (
+                      {(result.release_date || result.first_air_date) && (
                         <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                           <Calendar className="w-3 h-3" />
-                          <span>{new Date(result.release_date).getFullYear()}</span>
+                          <span>
+                            {new Date(result.release_date || result.first_air_date!).getFullYear()}
+                          </span>
+                          <span className="text-xs bg-muted px-1 rounded">
+                            {result.media_type === 'tv' ? 'TV' : 'Movie'}
+                          </span>
                         </div>
                       )}
 

@@ -22,60 +22,9 @@ const Navbar = () => {
             Cinehub
           </Link>
 
-          {/* Desktop Nav */}
-          <ul className="hidden lg:flex items-center justify-start gap-8">
-            <Link href="/" className="text-xl">
-              Home
-            </Link>
-            <Link href="/" className="text-xl">
-              Browse
-            </Link>
-            <Link href="/" className="text-xl">
-              Trending
-            </Link>
-            <Link href="/" className="text-xl">
-              Popular
-            </Link>
-          </ul>
-
           {/* Search and Mobile Menu */}
           <div className="flex items-center gap-4">
             <SearchDialog />
-            
-            {/* Mobile Sidebar */}
-            <div className="lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  className="aspect-square border border-white p-2 size-10"
-                  variant="ghost"
-                >
-                  <MenuIcon className="w-full h-full" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64">
-                <SheetHeader>
-                  <SheetTitle className="text-2xl font-secondary">
-                    Cinehub
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="mt-6 flex flex-col gap-4">
-                  <Link href="/" className="text-lg">
-                    Home
-                  </Link>
-                  <Link href="/" className="text-lg">
-                    Browse
-                  </Link>
-                  <Link href="/" className="text-lg">
-                    Trending
-                  </Link>
-                  <Link href="/" className="text-lg">
-                    Popular
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
-            </div>
           </div>
         </div>
       </nav>

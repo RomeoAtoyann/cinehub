@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GenreName, getTrendingMovies } from "@/helpers/getTrendingMovies";
+import { GenreName, getTrendingTVShows } from "@/helpers/getTrendingTVShows";
 import MovieCard from "./movie-card";
 import {
   Pagination,
@@ -13,11 +13,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-interface MovieRowProps {
-  platformTitle: "Movies";
+interface TVShowRowProps {
+  platformTitle: "TV Shows";
 }
 
-export interface Movie {
+export interface TVShow {
   id: number;
   title: string;
   image: string;
@@ -27,24 +27,24 @@ export interface Movie {
   genre: GenreName[];
 }
 
-const MovieRow = ({ platformTitle }: MovieRowProps) => {
-  const [movies, setMovies] = useState<Movie[]>([]);
+const TVShowRow = ({ platformTitle }: TVShowRowProps) => {
+  const [tvShows, setTVShows] = useState<TVShow[]>([]);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      const data = await getTrendingMovies(page);
-      setMovies(data);
+    const fetchTVShows = async () => {
+      const data = await getTrendingTVShows(page);
+      setTVShows(data);
     };
-    fetchMovies();
+    fetchTVShows();
   }, [page]);
 
   return (
     <div className="pb-8 px-4 lg:px-0">
       <h1 className="text-4xl font-bold mb-6">Popular {platformTitle}</h1>
       <section className="grid grid-cols-2 lg:grid-cols-5 gap-6">
-        {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} mediaType="movie" />
+        {tvShows.map((show) => (
+          <MovieCard key={show.id} movie={show} mediaType="tv" />
         ))}
       </section>
 
@@ -87,4 +87,4 @@ const MovieRow = ({ platformTitle }: MovieRowProps) => {
   );
 };
 
-export default MovieRow;
+export default TVShowRow; 
