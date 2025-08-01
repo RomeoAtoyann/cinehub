@@ -6,10 +6,13 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { PlayIcon } from "lucide-react";
 import { getBestMovies } from "@/helpers/getBestMovies";
+import { useViewMovieStore } from "@/store/viewMovieStore";
 
 const Hero = () => {
   const [movies, setMovies] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const setOpen = useViewMovieStore((state) => state.setOpen);
+  const setMovie = useViewMovieStore((state) => state.setMovie);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -83,7 +86,14 @@ const Hero = () => {
           </div>
           <p className="mb-6 font-semibold">{currentMovie.overview}</p>
           <div>
-            <Button>
+            <Button
+              onClick={() => {
+                setMovie(currentMovie);
+                setOpen(true);
+              }}
+              className="hover:scale-105 transition-transform duration-200 hover:bg-white/90"
+              size="lg"
+            >
               <PlayIcon fill="black" className="mr-2" />
               Watch Now
             </Button>
