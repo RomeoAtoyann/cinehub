@@ -30,7 +30,7 @@ const Hero = () => {
   if (movies.length === 0) {
     return (
       <div className="h-[70vh] flex items-center justify-center text-xl">
-        Loading...
+        Loading ...
       </div>
     );
   }
