@@ -18,6 +18,11 @@ const Hero = () => {
     const fetchMovies = async () => {
       const data = await getBestMovies();
       setMovies(data);
+      // Start with a random movie instead of always the first one
+      if (data.length > 0) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        setCurrentIndex(randomIndex);
+      }
     };
     fetchMovies();
   }, []);
