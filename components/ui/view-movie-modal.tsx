@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { useViewMovieStore } from "@/store/viewMovieStore";
+import { addToRecentlyWatched, getRecentlyWatched } from "@/helpers/recentlyWatchedUtils";
 
 const ViewMovieModal = () => {
   const open = useViewMovieStore((state) => state.open);
@@ -21,8 +22,16 @@ const ViewMovieModal = () => {
 
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
+  const isInitialLoad = useRef(true);
 
-  const { title, year, id, media_type, overview } = movie ?? {};
+  const { title, year, id, media_type, overview } = (movie as any) ?? {};
+
+  // Reset the initial load flag when modal opens
+  useEffect(() => {
+    if (open && media_type === 'tv') {
+      isInitialLoad.current = true;
+    }
+  }, [open, media_type]);
 
   // Fetch episodes when season changes
   useEffect(() => {
@@ -39,8 +48,14 @@ const ViewMovieModal = () => {
       .then((seasonData) => {
         if (seasonData?.episodes) {
           setEpisodes(seasonData.episodes);
-          // Reset episode to 1 when season changes
-          setSelectedEpisode(1);
+          // Only reset episode to 1 if this is a manual season change, not initial load
+          if (isInitialLoad.current) {
+            // This is the initial load, don't reset episode
+            isInitialLoad.current = false;
+          } else {
+            // This is a manual season change, reset episode
+            setSelectedEpisode(1);
+          }
         }
         setLoadingEpisodes(false);
       })
@@ -48,7 +63,7 @@ const ViewMovieModal = () => {
         setLoadingEpisodes(false);
       });
     }
-  }, [media_type, tvShowDetails?.tmdbId, selectedSeason, setSelectedEpisode]);
+  }, [media_type, tvShowDetails?.tmdbId, selectedSeason, setSelectedEpisode, selectedEpisode]);
 
   const getEmbedUrl = () => {
     if (media_type === 'movie') {
@@ -60,6 +75,19 @@ const ViewMovieModal = () => {
   };
 
   const embedUrl = getEmbedUrl();
+
+
+
+  // Track when user watches content
+  useEffect(() => {
+    if (embedUrl && movie) {
+      if (media_type === 'movie') {
+        addToRecentlyWatched(movie.id, 'movie');
+      } else if (media_type === 'tv' && tvShowDetails) {
+        addToRecentlyWatched(tvShowDetails.tmdbId, 'tv', selectedSeason, selectedEpisode);
+      }
+    }
+  }, [embedUrl, movie, media_type, tvShowDetails, selectedSeason, selectedEpisode]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

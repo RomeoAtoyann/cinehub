@@ -8,7 +8,6 @@ interface MediaItem {
   backdrop: string;
   poster: string;
   genre: string[];
-  overview?: string;
   media_type: 'movie' | 'tv';
 }
 
@@ -35,6 +34,7 @@ interface MovieState {
   setTVShowDetails: (details: TVShowDetails | null) => void;
   setSelectedSeason: (season: number) => void;
   setSelectedEpisode: (episode: number) => void;
+  setInitialSeasonAndEpisode: (season: number, episode: number) => void;
 }
 
 export const useViewMovieStore = create<MovieState>()((set) => ({
@@ -48,4 +48,5 @@ export const useViewMovieStore = create<MovieState>()((set) => ({
   setTVShowDetails: (details) => set({ tvShowDetails: details }),
   setSelectedSeason: (season) => set({ selectedSeason: season }),
   setSelectedEpisode: (episode) => set({ selectedEpisode: episode }),
+  setInitialSeasonAndEpisode: (season, episode) => set({ selectedSeason: season, selectedEpisode: episode }),
 }));

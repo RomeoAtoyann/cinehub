@@ -23,6 +23,8 @@ interface MediaItem {
   overview: string;
   genre: string[];
   mediaType: "movie" | "tv";
+  season?: number;
+  episode?: number;
 }
 
 const RecentlyWatched = () => {
@@ -32,6 +34,7 @@ const RecentlyWatched = () => {
   const setOpen = useViewMovieStore((state) => state.setOpen);
   const setMovie = useViewMovieStore((state) => state.setMovie);
   const setTVShowDetails = useViewMovieStore((state) => state.setTVShowDetails);
+  const setInitialSeasonAndEpisode = useViewMovieStore((state) => state.setInitialSeasonAndEpisode);
 
   useEffect(() => {
     const loadRecentlyWatched = async () => {
@@ -68,6 +71,8 @@ const RecentlyWatched = () => {
                   overview: movieDetails.overview,
                   genre: [] as string[],
                   mediaType: "movie" as const,
+                  season: item.season,
+                  episode: item.episode,
                 };
               }
             } else if (item.mediaType === "tv") {
@@ -90,6 +95,8 @@ const RecentlyWatched = () => {
                   overview: tvShowDetails.overview,
                   genre: [] as string[],
                   mediaType: "tv" as const,
+                  season: item.season,
+                  episode: item.episode,
                 };
               }
             }
@@ -100,9 +107,7 @@ const RecentlyWatched = () => {
         });
 
         const results = await Promise.all(promises);
-        const validItems = results.filter(
-          (item): item is MediaItem => item !== null
-        );
+        const validItems = results.filter((item) => item !== null) as MediaItem[];
         setRecentItems(validItems);
       } catch (error) {
         console.error("Error loading recently watched:", error);
@@ -122,14 +127,24 @@ const RecentlyWatched = () => {
     };
     setMovie(movieWithType);
 
-    // If it's a TV show, fetch the details
+    // If it's a TV show, fetch the details and set initial season/episode
     if (item.mediaType === "tv") {
       const tvShowDetails = await getTVShowDetails(item.id);
       setTVShowDetails(tvShowDetails);
+      
+      // Set the initial season and episode from recently watched data
+      if (item.season && item.episode) {
+        // Add a small delay to ensure the modal is open before setting the values
+        setTimeout(() => {
+          if (item.season && item.episode) {
+            setInitialSeasonAndEpisode(item.season, item.episode);
+          }
+        }, 100);
+      }
     }
 
     // Move this item to the beginning of recently watched
-    addToRecentlyWatched(item.id, item.mediaType);
+    addToRecentlyWatched(item.id, item.mediaType, item.season, item.episode);
   };
 
   if (loading) {
@@ -173,8 +188,15 @@ const RecentlyWatched = () => {
               <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/60" />
 
               <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-3xl md:text-3xl flex flex-col items-center text-center font-semibold text-white opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 drop-shadow">
-                  {item.title}
+                <div className="flex flex-col items-center text-center text-white opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 drop-shadow">
+                  <h3 className="text-3xl md:text-3xl font-semibold mb-2">
+                    {item.title}
+                  </h3>
+                  {item.mediaType === "tv" && item.season && item.episode && (
+                    <p className="text-lg font-medium text-gray-200 mb-2">
+                      Season {item.season} • Episode {item.episode}
+                    </p>
+                  )}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-12 h-12 text-white transform scale-90 group-hover:scale-100 transition-transform duration-300"
@@ -183,7 +205,7 @@ const RecentlyWatched = () => {
                   >
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                </h3>
+                </div>
               </div>
             </div>
           </SwiperSlide>

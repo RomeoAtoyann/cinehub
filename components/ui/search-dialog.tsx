@@ -16,7 +16,6 @@ import { searchMovies } from "@/helpers/searchMovies";
 import { searchTVShows } from "@/helpers/searchTVShows";
 import { getTVShowDetails } from "@/helpers/getTVShowDetails";
 import { useViewMovieStore } from "@/store/viewMovieStore";
-import { addToRecentlyWatched } from "@/helpers/recentlyWatchedUtils";
 
 interface SearchResult {
   id: number;
@@ -112,7 +111,6 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
       image: result.poster_path || "",
       backdrop: result.backdrop_path || "",
       poster: result.poster_path || "",
-      overview: result.overview,
       genre: [], // We could add genre mapping if needed
       media_type: result.media_type,
     };
@@ -125,9 +123,6 @@ const SearchDialog = ({ onSearch }: SearchDialogProps) => {
       const tvShowDetails = await getTVShowDetails(result.id);
       setTVShowDetails(tvShowDetails);
     }
-
-    // Add to recently watched
-    addToRecentlyWatched(result.id, result.media_type);
     
     // Close the search dialog and reset
     setIsOpen(false);

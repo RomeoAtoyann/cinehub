@@ -1,48 +1,78 @@
 export interface RecentlyWatchedItem {
   id: number;
   mediaType: "movie" | "tv";
+  timestamp: number;
+  season?: number;
+  episode?: number;
 }
 
-export const addToRecentlyWatched = (id: number, mediaType: "movie" | "tv") => {
-  try {
-    const key = "recently_watched";
-    const raw = localStorage.getItem(key);
-    const existingItems = raw ? JSON.parse(raw) : [];
-    
-    // Create new item with id and media type
-    const newItem: RecentlyWatchedItem = { id, mediaType };
-    
-    // Remove existing item with same id if exists, then add new item at the beginning
-    const filteredItems = existingItems.filter((item: RecentlyWatchedItem) => item.id !== id);
-    const updatedItems = [newItem, ...filteredItems];
-    
-    // Keep only the last 20 items
-    const limitedItems = updatedItems.slice(0, 20);
-    
-    localStorage.setItem(key, JSON.stringify(limitedItems));
-  } catch (e) {
-    console.error("localStorage error:", e);
-  }
-};
+const RECENTLY_WATCHED_KEY = "recentlyWatched";
+const MAX_ITEMS = 20;
 
 export const getRecentlyWatched = (): RecentlyWatchedItem[] => {
+  if (typeof window === "undefined") return [];
+  
   try {
-    if (typeof window === "undefined") return [];
-    
-    const raw = localStorage.getItem("recently_watched");
-    if (!raw) return [];
-    
-    return JSON.parse(raw);
-  } catch (e) {
-    console.error("Error getting recently watched:", e);
+    const stored = localStorage.getItem(RECENTLY_WATCHED_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error("Error reading recently watched:", error);
     return [];
   }
 };
 
-export const clearRecentlyWatched = () => {
+export const addToRecentlyWatched = (
+  id: number, 
+  mediaType: "movie" | "tv", 
+  season?: number, 
+  episode?: number
+) => {
+  if (typeof window === "undefined") return;
+
   try {
-    localStorage.removeItem("recently_watched");
-  } catch (e) {
-    console.error("Error clearing recently watched:", e);
+    const currentItems = getRecentlyWatched();
+    
+    // Remove existing item with same id and mediaType
+    const filteredItems = currentItems.filter(
+      item => !(item.id === id && item.mediaType === mediaType)
+    );
+    
+    // Add new item at the beginning
+    const newItem: RecentlyWatchedItem = {
+      id,
+      mediaType,
+      timestamp: Date.now(),
+      ...(season && { season }),
+      ...(episode && { episode }),
+    };
+    
+    const updatedItems = [newItem, ...filteredItems].slice(0, MAX_ITEMS);
+    localStorage.setItem(RECENTLY_WATCHED_KEY, JSON.stringify(updatedItems));
+  } catch (error) {
+    console.error("Error adding to recently watched:", error);
+  }
+};
+
+export const removeFromRecentlyWatched = (id: number, mediaType: "movie" | "tv") => {
+  if (typeof window === "undefined") return;
+
+  try {
+    const currentItems = getRecentlyWatched();
+    const filteredItems = currentItems.filter(
+      item => !(item.id === id && item.mediaType === mediaType)
+    );
+    localStorage.setItem(RECENTLY_WATCHED_KEY, JSON.stringify(filteredItems));
+  } catch (error) {
+    console.error("Error removing from recently watched:", error);
+  }
+};
+
+export const clearRecentlyWatched = () => {
+  if (typeof window === "undefined") return;
+  
+  try {
+    localStorage.removeItem(RECENTLY_WATCHED_KEY);
+  } catch (error) {
+    console.error("Error clearing recently watched:", error);
   }
 }; 
