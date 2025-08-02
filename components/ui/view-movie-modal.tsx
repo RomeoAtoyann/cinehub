@@ -68,7 +68,7 @@ const ViewMovieModal = () => {
           <DialogTitle className="text-left lg:text-6xl">{title}</DialogTitle>
           <span className="text-gray-400 text-lg inline text-left">{year}</span>
           {(overview || (media_type === 'tv' && tvShowDetails?.overview)) && (
-            <p className="text-gray-300 text-sm lg:text-base mt-4 leading-relaxed max-w-2xl">
+            <p className="text-gray-300 text-sm lg:text-base mt-4 leading-relaxed max-w-2xl text-left">
               {media_type === 'tv' && tvShowDetails?.overview ? tvShowDetails.overview : (overview || '')}
             </p>
           )}
