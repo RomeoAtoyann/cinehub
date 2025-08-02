@@ -23,17 +23,18 @@ const ViewMovieModal = () => {
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
   const isInitialLoad = useRef(true);
-  const previousSeason = useRef(1);
+  const lastProcessedSeason = useRef(1);
 
   const { title, year, id, media_type, overview } = (movie as any) ?? {};
 
   // Reset the initial load flag when modal opens
   useEffect(() => {
     if (open && media_type === 'tv') {
+      console.log(`Modal opened with season: ${selectedSeason}, episode: ${selectedEpisode}`);
       isInitialLoad.current = true;
-      previousSeason.current = selectedSeason;
+      lastProcessedSeason.current = selectedSeason;
     }
-  }, [open, media_type, selectedSeason]);
+  }, [open, media_type, selectedSeason, selectedEpisode]);
 
   // Fetch episodes when season changes
   useEffect(() => {
@@ -53,13 +54,17 @@ const ViewMovieModal = () => {
           // Only reset episode to 1 if this is a manual season change, not initial load
           if (isInitialLoad.current) {
             // This is the initial load, don't reset episode
+            console.log(`Initial load: season ${selectedSeason}, episode ${selectedEpisode}`);
             isInitialLoad.current = false;
-          } else if (previousSeason.current !== selectedSeason) {
+          } else if (lastProcessedSeason.current !== selectedSeason) {
             // This is a manual season change, reset episode
+            console.log(`Manual season change: ${lastProcessedSeason.current} -> ${selectedSeason}, resetting episode`);
             setSelectedEpisode(1);
-            previousSeason.current = selectedSeason;
+          } else {
+            console.log(`Same season (${selectedSeason}), allowing episode change`);
           }
-          // If it's the same season, don't reset episode (allows manual episode changes)
+          // Update lastProcessedSeason after processing
+          lastProcessedSeason.current = selectedSeason;
         }
         setLoadingEpisodes(false);
       })
