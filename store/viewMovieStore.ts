@@ -8,6 +8,7 @@ interface MediaItem {
   backdrop: string;
   poster: string;
   genre: string[];
+  overview?: string;
   media_type: 'movie' | 'tv';
 }
 

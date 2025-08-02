@@ -22,7 +22,7 @@ const ViewMovieModal = () => {
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
 
-  const { title, year, id, media_type } = movie ?? {};
+  const { title, year, id, media_type, overview } = movie ?? {};
 
   // Fetch episodes when season changes
   useEffect(() => {
@@ -67,6 +67,11 @@ const ViewMovieModal = () => {
         <DialogHeader className="p-4">
           <DialogTitle className="text-left lg:text-6xl">{title}</DialogTitle>
           <span className="text-gray-400 text-lg inline text-left">{year}</span>
+          {(overview || (media_type === 'tv' && tvShowDetails?.overview)) && (
+            <p className="text-gray-300 text-sm lg:text-base mt-4 leading-relaxed max-w-2xl">
+              {media_type === 'tv' && tvShowDetails?.overview ? tvShowDetails.overview : (overview || '')}
+            </p>
+          )}
         </DialogHeader>
         
         {media_type === 'tv' && tvShowDetails && (

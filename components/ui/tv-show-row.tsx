@@ -24,6 +24,7 @@ export interface TVShow {
   backdrop: string;
   poster: string;
   year: string;
+  overview: string;
   genre: GenreName[];
 }
 

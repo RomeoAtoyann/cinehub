@@ -7,6 +7,7 @@ import { Button } from "./button";
 import { PlayIcon } from "lucide-react";
 import { getBestMovies } from "@/helpers/getBestMovies";
 import { useViewMovieStore } from "@/store/viewMovieStore";
+import { addToRecentlyWatched } from "@/helpers/recentlyWatchedUtils";
 
 const Hero = () => {
   const [movies, setMovies] = useState<any[]>([]);
@@ -48,16 +49,22 @@ const Hero = () => {
   return (
     <div className="h-[70vh] overflow-hidden flex items-end py-6 px-4 lg:px-0 lg:pb-16">
       <AnimatePresence mode="wait">
-        <motion.img
+        <motion.div
           key={currentMovie.id}
-          src={currentMovie.backdrop}
-          alt={currentMovie.title}
-          className="absolute top-0 left-0 w-full h-full object-cover z-[-1] opacity-65"
+          className="absolute top-0 left-0 w-full h-full z-[-1]"
           initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 0.65, scale: 1 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 1.05 }}
           transition={{ duration: 1 }}
-        />
+        >
+          <img
+            src={currentMovie.backdrop}
+            alt={currentMovie.title}
+            className="w-full h-full object-cover opacity-65"
+          />
+          {/* Netflix-style black fade gradient */}
+          <div className="absolute bottom-0 left-0 right-0 h-60 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+        </motion.div>
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
@@ -95,9 +102,13 @@ const Hero = () => {
               onClick={() => {
                 setMovie({
                   ...currentMovie,
+                  overview: currentMovie.overview,
                   media_type: 'movie',
                 });
                 setOpen(true);
+                
+                // Add to recently watched
+                addToRecentlyWatched(currentMovie.id, 'movie');
               }}
               className="hover:scale-105 transition-transform duration-200 hover:bg-white/90"
               size="lg"

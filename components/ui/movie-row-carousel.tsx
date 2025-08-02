@@ -3,9 +3,13 @@
 import "swiper/css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Badge } from "./badge";
+import { useViewMovieStore } from "@/store/viewMovieStore";
+import { getTVShowDetails } from "@/helpers/getTVShowDetails";
+import { addToRecentlyWatched } from "@/helpers/recentlyWatchedUtils";
 
 interface MovieRowCarouselProps {
   movies: MovieRowCard[];
+  mediaType?: "movie" | "tv";
 }
 
 interface MovieRowCard {
@@ -17,11 +21,39 @@ interface MovieRowCard {
   genre: number[];
 }
 
-const MovieRowCarousel = ({ movies }: MovieRowCarouselProps) => {
+const MovieRowCarousel = ({ movies, mediaType = "movie" }: MovieRowCarouselProps) => {
+  const setOpen = useViewMovieStore((state) => state.setOpen);
+  const setMovie = useViewMovieStore((state) => state.setMovie);
+  const setTVShowDetails = useViewMovieStore((state) => state.setTVShowDetails);
+
+  const handleClick = async (movie: MovieRowCard) => {
+    setOpen(true);
+    const movieWithType = {
+      id: movie.id,
+      title: movie.title,
+      year: movie.year,
+      image: movie.image,
+      backdrop: movie.backdrop,
+      poster: movie.image,
+      genre: [],
+      media_type: mediaType,
+    };
+    setMovie(movieWithType);
+
+    // If it's a TV show, fetch the details
+    if (mediaType === "tv") {
+      const tvShowDetails = await getTVShowDetails(movie.id);
+      setTVShowDetails(tvShowDetails);
+    }
+
+    // Add to recently watched
+    addToRecentlyWatched(movie.id, mediaType);
+  };
+
   return (
     <Swiper spaceBetween={20} slidesPerView={3}>
       {movies.map((movie) => (
-        <SwiperSlide key={movie.id} className="cursor-pointer">
+        <SwiperSlide key={movie.id} className="cursor-pointer" onClick={() => handleClick(movie)}>
           <div className="relative h-64 w-full rounded-sm border border-gray-600 overflow-hidden mb-4">
             <img
               className="absolute inset-0 h-full w-full object-cover hover:scale-105 transition-all ease-in-out"

@@ -56,6 +56,7 @@ export const GENRES = {
           ? `https://image.tmdb.org/t/p/w780${movie.poster_path}`
           : "",
         year: movie.release_date?.slice(0, 4) ?? "",
+        overview: movie.overview,
         genre: (movie.genre_ids ?? [])
           .map((id: number) =>
             (Object.keys(GENRES) as GenreName[]).find(

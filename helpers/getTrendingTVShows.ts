@@ -56,6 +56,7 @@ export const getTrendingTVShows = async (page = 1) => {
         ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
         : "",
       year: show.first_air_date?.slice(0, 4) ?? "",
+      overview: show.overview,
       genre: (show.genre_ids ?? [])
         .map((id: number) =>
           (Object.keys(GENRES) as GenreName[]).find(
