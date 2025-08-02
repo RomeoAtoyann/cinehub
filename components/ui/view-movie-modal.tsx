@@ -30,11 +30,10 @@ const ViewMovieModal = () => {
   // Reset the initial load flag when modal opens
   useEffect(() => {
     if (open && media_type === 'tv') {
-      console.log(`Modal opened with season: ${selectedSeason}, episode: ${selectedEpisode}`);
       isInitialLoad.current = true;
       lastProcessedSeason.current = selectedSeason;
     }
-  }, [open, media_type, selectedSeason, selectedEpisode]);
+  }, [open, media_type, selectedSeason]);
 
   // Fetch episodes when season changes
   useEffect(() => {
@@ -54,14 +53,10 @@ const ViewMovieModal = () => {
           // Only reset episode to 1 if this is a manual season change, not initial load
           if (isInitialLoad.current) {
             // This is the initial load, don't reset episode
-            console.log(`Initial load: season ${selectedSeason}, episode ${selectedEpisode}`);
             isInitialLoad.current = false;
           } else if (lastProcessedSeason.current !== selectedSeason) {
             // This is a manual season change, reset episode
-            console.log(`Manual season change: ${lastProcessedSeason.current} -> ${selectedSeason}, resetting episode`);
             setSelectedEpisode(1);
-          } else {
-            console.log(`Same season (${selectedSeason}), allowing episode change`);
           }
           // Update lastProcessedSeason after processing
           lastProcessedSeason.current = selectedSeason;
@@ -77,8 +72,8 @@ const ViewMovieModal = () => {
   const getEmbedUrl = () => {
     if (media_type === 'movie') {
       return `https://www.2embed.cc/embed/${id}`;
-    } else if (media_type === 'tv' && tvShowDetails?.tmdbId) {
-      return `https://www.2embed.cc/embedtv/${tvShowDetails.tmdbId}&s=${selectedSeason}&e=${selectedEpisode}`;
+    } else if (media_type === 'tv' && id) {
+      return `https://www.2embed.cc/embedtv/${id}&s=${selectedSeason}&e=${selectedEpisode}`;
     }
     return null;
   };
@@ -92,11 +87,11 @@ const ViewMovieModal = () => {
     if (embedUrl && movie) {
       if (media_type === 'movie') {
         addToRecentlyWatched(movie.id, 'movie');
-      } else if (media_type === 'tv' && tvShowDetails) {
-        addToRecentlyWatched(tvShowDetails.tmdbId, 'tv', selectedSeason, selectedEpisode);
+      } else if (media_type === 'tv') {
+        addToRecentlyWatched(movie.id, 'tv', selectedSeason, selectedEpisode);
       }
     }
-  }, [embedUrl, movie, media_type, tvShowDetails, selectedSeason, selectedEpisode]);
+  }, [embedUrl, movie, media_type, selectedSeason, selectedEpisode]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
