@@ -23,6 +23,7 @@ const ViewMovieModal = () => {
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
   const isInitialLoad = useRef(true);
+  const previousSeason = useRef(1);
 
   const { title, year, id, media_type, overview } = (movie as any) ?? {};
 
@@ -30,8 +31,9 @@ const ViewMovieModal = () => {
   useEffect(() => {
     if (open && media_type === 'tv') {
       isInitialLoad.current = true;
+      previousSeason.current = selectedSeason;
     }
-  }, [open, media_type]);
+  }, [open, media_type, selectedSeason]);
 
   // Fetch episodes when season changes
   useEffect(() => {
@@ -52,10 +54,12 @@ const ViewMovieModal = () => {
           if (isInitialLoad.current) {
             // This is the initial load, don't reset episode
             isInitialLoad.current = false;
-          } else {
+          } else if (previousSeason.current !== selectedSeason) {
             // This is a manual season change, reset episode
             setSelectedEpisode(1);
+            previousSeason.current = selectedSeason;
           }
+          // If it's the same season, don't reset episode (allows manual episode changes)
         }
         setLoadingEpisodes(false);
       })
