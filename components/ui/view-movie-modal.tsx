@@ -95,7 +95,7 @@ const ViewMovieModal = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-full lg:h-auto lg:max-w-6xl lg:min-h-[700px]">
+      <DialogContent className="w-full lg:h-auto lg:max-w-6xl lg:min-h-[700px] max-h-[600px] lg:max-h-[850px] overflow-y-scroll">
         <DialogHeader className="p-4">
           <DialogTitle className="text-left lg:text-6xl">{title}</DialogTitle>
           <span className="text-gray-400 text-lg inline text-left">{year}</span>
